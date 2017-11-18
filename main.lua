@@ -1,37 +1,20 @@
 world = {}
 platform = {}
+-- player stuff
 player = {}
 
-function love.load()
--- player starting vals
-    player.img = love.graphics.newImage("img/bird-monster.png")
-    player.h = 100
-    player.w = 100/player.img:getHeight()*player.img:getWidth()
-    -- scale factor
-    player.sf = 100/player.img:getHeight()
-    player.dir = 1
-    player.x = 50
-    player.y = 50
-    player.a = 800
-    player.isKin = false
-    player.velocity = {0,0}
-
--- platform starting vals
-    platform.w = love.graphics.getWidth()
-    platform.h = love.graphics.getHeight()
-
-    platform.x = 0
-    platform.y = 500
+function platform:draw()
+    love.graphics.rectangle('fill',platform.x, platform.y, platform.w, platform.h)
 end
 
-function love.update(dt)
+function player:update(dt)
 -- move player
 
     if love.keyboard.isDown("right") then
-        player.velocity[1]= 100
+        player.velocity[1]= 200
         player.dir = 0
     elseif love.keyboard.isDown("left") then
-        player.velocity[1]= -100
+        player.velocity[1]= -200
         player.dir = 1
     elseif collide(player, platform) then
         player.velocity[1] = 0
@@ -40,7 +23,7 @@ function love.update(dt)
         player.velocity[2] = 0
         collideResponse(player,platform)
         if love.keyboard.isDown("up") then
-            player.velocity[2] = -400
+            player.velocity[2] = -600
         end
     end
 
@@ -49,16 +32,55 @@ function love.update(dt)
     player.y = player.y + player.velocity[2]*dt
 end
 
-function love.draw()
-    love.graphics.setColor(255,255,255)
+function player:draw()
     if player.dir == 0 then
         love.graphics.draw(player.img, player.x+player.w, player.y,0,-player.sf,player.sf,0,32)
     else 
         love.graphics.draw(player.img, player.x, player.y,0,player.sf,player.sf,0,32)
     end
-    love.graphics.rectangle('fill',platform.x, platform.y, platform.w, platform.h)
 end
 
+function love.load()
+-- player starting vals
+    player.img = love.graphics.newImage("img/bird-monster.png")
+    player.h = 150
+    player.w = player.h/player.img:getHeight()*player.img:getWidth()
+    -- scale factor
+    player.sf = player.h/player.img:getHeight()
+    player.dir = 1
+    player.x = 50
+    player.y = 50
+    player.a = 1250
+    player.velocity = {0,0}
+
+-- platform starting vals
+    platform.w = love.graphics.getWidth()
+    platform.h = love.graphics.getHeight()
+
+    platform.x = 0
+    platform.y = 500
+
+
+-- create entities
+    entity = {player}
+    world = {platform, player}
+end
+
+function love.update(dt)
+    for i,v in ipairs(entity)do
+        v:update(dt)
+    end
+end
+
+function love.draw()
+    love.graphics.setColor(255,255,255)
+    for i,v in ipairs(world)do
+        v:draw()
+    end
+end
+
+
+-- collidy functions
 function collide(a,b)
     return CheckCollision(a.x,a.y,a.w,a.h,b.x,b.y,b.w,b.h)
 end
@@ -87,3 +109,4 @@ function collideResponse(a,b)
         a.y = a.y - h
     end
 end
+--- end of collidy functions
