@@ -36,14 +36,16 @@ function factory.enemyFactory(x,y,w,h,sf,health,dmg, img)
         self.y = self.y + self.velocity[2]*dt
     end
 
-    function enemy:draw()
+    function enemy:draw(window)
         if self.dir == 0 then
-            love.graphics.draw(self.img, self.x+self.w, self.y,0,-self.sf,self.sf,0,0)
+            love.graphics.draw(self.img, self.x+self.w+window, self.y,0,-self.sf,self.sf,0,0)
         else 
-            love.graphics.draw(self.img, self.x, self.y,0,self.sf,self.sf,0,0)
+            love.graphics.draw(self.img, self.x+window, self.y,0,self.sf,self.sf,0,0)
         end
-        love.graphics.rectangle("fill", self.x,self.y-10,self.health,5)
-        love.graphics.rectangle("line", self.x,self.y-10,self.maxhealth,5)
+        love.graphics.setColor(0,0,0)
+        love.graphics.rectangle("fill", self.x+ window,self.y-10,self.health,5)
+        love.graphics.rectangle("line", self.x+ window,self.y-10,self.maxhealth,5)
+        love.graphics.setColor(255,255,255)
     end
 
     return enemy
@@ -114,14 +116,16 @@ function factory.playerFactory()
         end
     end
 
-    function player:draw()
+    function player:draw(window)
         if self.dir == 0 then
-            love.graphics.draw(self.img, self.x+self.w, self.y,0,-self.sf,self.sf,0,0)
+            love.graphics.draw(self.img, self.x+self.w+window, self.y,0,-self.sf,self.sf,0,0)
         else 
-            love.graphics.draw(self.img, self.x, self.y,0,self.sf,self.sf,0,0)
+            love.graphics.draw(self.img, self.x+ window, self.y,0,self.sf,self.sf,0,0)
         end
-        love.graphics.rectangle("fill", self.x,self.y-10,self.health,5)
-        love.graphics.rectangle("line", self.x,self.y-10,self.maxhealth,5)
+        love.graphics.setColor(0,0,0)
+        love.graphics.rectangle("fill", self.x+ window,self.y-10,self.health,5)
+        love.graphics.rectangle("line", self.x+ window,self.y-10,self.maxhealth,5)
+        love.graphics.setColor(255,255,255)
     end
     return player
 end
