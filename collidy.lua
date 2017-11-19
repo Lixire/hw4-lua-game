@@ -12,6 +12,21 @@ function CheckCollision(x1,y1,w1,h1, x2,y2,w2,h2)
          y2 < y1+h1
 end
 
+function CheckCollisionHorizontal(a,world)
+    for i,b in ipairs(world) do
+        if b ~= a and b.isChar == false then
+            if collidy.collide(a,b) then
+                if a.velocity[1] < 0 and a.dir == 1 and a.x > b.x then
+                    return true
+                elseif a.velocity[1] > 0 and a.dir == 0 and a.x < b.x then
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
 function collidy.collideResponse(a,b)
     x = math.max(a.x, b.x)
     y = math.max(a.y, b.y)

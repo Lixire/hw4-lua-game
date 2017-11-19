@@ -134,16 +134,20 @@ function factory.playerFactory()
             self.velocity[1] = 0
         end
 
-        -- collision detection and response
-        if is_colliding then
-            self.velocity[2] = 0
-            collidy.collideResponseAll(self,world)
-        end
-
         -- player jump
         if love.keyboard.isDown("up") and is_colliding then
             self.velocity[2] = -600
         end
+
+        -- collision detection and response
+        if is_colliding then
+            self.velocity[2] = 0
+            if CheckCollisionHorizontal(self,world) then
+                self.velocity[2] = -600
+            end
+            collidy.collideResponseAll(self,world)
+        end
+
 
         -- player combat
         if self.is_attacking then
