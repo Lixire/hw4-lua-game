@@ -1,5 +1,5 @@
 local factory = {}
-function factory.enemyFactory(x,y,w,h,sf,health,dmg, img)
+function factory.enemyFactory(x,y,w,h,sf,health,dmg, speed, wallhack, img)
     local enemy = {}
     enemy.x = x
     enemy.y = y
@@ -8,6 +8,8 @@ function factory.enemyFactory(x,y,w,h,sf,health,dmg, img)
     enemy.health = health
     enemy.maxhealth = health
     enemy.dmg = dmg
+    enemy.speed = speed
+    enemy.wallhack = wallhack
     enemy.sf = sf
     enemy.a = 1250
     enemy.img = img
@@ -18,16 +20,25 @@ function factory.enemyFactory(x,y,w,h,sf,health,dmg, img)
     function enemy:update(dt,world)
     -- move enemy towards player
         if player.x < self.x then
-            self.velocity[1]= -70
+            self.velocity[1]= -speed
             self.dir = 1
         else
-            self.velocity[1]= 70
+            self.velocity[1]= speed
             self.dir = 0
         end
+
+        if self.wallhack then
+            if player.y - 50 < self.y then
+                self.velocity[2]= -speed
+            else
+                self.velocity[2]= speed
+            end
+        end
+
         -- TODO: better AI, what direction the collision was in? So I can change velocity accordingly. I'm assuming in this
         -- iteration that I'm only dealing with vertical collision
         -- collision detection and response
-        if collidy.collideAll(self, world) then
+        if not self.wallhack and collidy.collideAll(self, world) then
             self.velocity[2] = 0
             collidy.collideResponseAll(self, world)
         end
@@ -90,8 +101,8 @@ function factory.playerFactory()
     player.attack = love.graphics.newImage("img/bird-monster-attack.png")
 
     -- physics properties
-    player.x = 50
-    player.y = 300
+    player.x = 100
+    player.y = 0
     player.h = 150
     player.w = player.h/player.img:getHeight()*player.img:getWidth()
     player.velocity = {0,0}

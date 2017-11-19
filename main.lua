@@ -31,24 +31,19 @@ platforms = {{0, 132,103,800},
 {6350, 102,405,800}}
 
 function love.load()
-    spawnrate = 10
+    spawnrate = 5
     success = love.window.setMode(1000,800)
     love.graphics.setFont(love.graphics.newFont(30))
     love.graphics.setBackgroundColor(255, 255, 255)
     splashes = {love.graphics.newImage("img/splash1.png"),love.graphics.newImage("img/splash2.png")}
     splashrate = 0.5
     splashstate = 0
-    background = love.graphics.newImage("img/background-normal.png");
--- player starting vals
+    background = love.graphics.newImage("img/background-normal.png")
     player = factory.playerFactory()
     enemytype1 = love.graphics.newImage("img/rabbit-monster.png")
     enemytype2 = love.graphics.newImage("img/lamp-monster.png")
     enemytype3 = love.graphics.newImage("img/bird-normal.png")
     state = "menu"
-
--- create entities
-    --a = factory.enemyFactory(200,50,150/enemytype1:getHeight()*enemytype1:getWidth(),150,150/enemytype1:getHeight(), 40, 0.05, enemytype1)
-    --b =  factory.enemyFactory(400,50,200/enemytype2:getHeight()*enemytype2:getWidth(),200,200/enemytype2:getHeight(),100,0.1,enemytype2)
     window = {0,0}
     entity = {player}
     world1 = {player}
@@ -70,15 +65,26 @@ function love.update(dt)
     end
     spawnrate = spawnrate - dt
     if spawnrate < 0 then
-        local tmp = factory.enemyFactory(200,300,150/enemytype3:getHeight()*enemytype3:getWidth(),150,150/enemytype3:getHeight(), 40, 50, enemytype3)
-        table.insert(entity,tmp)
-        table.insert(world1,tmp)
+        local enemy_type = math.random(1, 3)
+        local new_entity
+        if enemy_type == 1 then
+            new_entity = factory.enemyFactory(player.x,-150,150/enemytype1:getHeight()*enemytype1:getWidth(),150,150/enemytype1:getHeight(), 40, 100, 40, true, enemytype1)
+        elseif enemy_type == 2 then
+            new_entity = factory.enemyFactory(player.x,-150,200/enemytype2:getHeight()*enemytype2:getWidth(),200,200/enemytype2:getHeight(),100,20,100, false,enemytype2)
+        elseif enemy_type == 3 then
+            new_entity = factory.enemyFactory(player.x,-150,150/enemytype3:getHeight()*enemytype3:getWidth(),150,150/enemytype3:getHeight(), 60, 50, 60, false, enemytype3)
+        end
+        table.insert(entity,new_entity)
+        table.insert(world1,new_entity)
         spawnrate = 10
     end
     for i,v in ipairs(entity) do
         if v == player then
             startx = v.x
             starty = v.y
+            if v.health <= 0 then
+                love.load()
+            end
         end
         if v ~= nil and v.health <= 0 then
             v = nil
@@ -86,7 +92,7 @@ function love.update(dt)
             v:update(dt,world1)
         end
         if v == player then
-            if v.y < 400 and v.y > 100 then
+            if v.y < 600 and v.y > 500 then
                 window[2] = window[2] - (v.y -starty)
             end
             if startx +window[1] > 500 and window[1] > -5700 and v.x> startx then
