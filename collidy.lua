@@ -39,20 +39,15 @@ function collidy.collideAll(a,world)
     return false
 end
 
-function collidy.collideResponseAll(a, world, flag)
-    ppp = true
+function collidy.collideResponseAll(a, world)
+    local colliding_entities = {}
     for i,v in ipairs(world) do
         if v~= a and (v.isChar == false or v.health > 0) and collidy.collide(a,v) then
-            if flag and v.isChar then
-                ppp = false
-                a:combat(v,a.isAttack > 0)
-            end
+            table.insert(colliding_entities, v)
             collidy.collideResponse(a,v)
         end
     end
-    if flag and ppp then
-        a.message = a.saved
-    end
+    return colliding_entities
 end
 
 --- end of collidy functions

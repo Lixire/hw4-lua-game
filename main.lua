@@ -70,7 +70,7 @@ function love.update(dt)
     end
     spawnrate = spawnrate - dt
     if spawnrate < 0 then
-        local tmp = factory.enemyFactory(200,300,150/enemytype3:getHeight()*enemytype3:getWidth(),150,150/enemytype3:getHeight(), 40, 0.05, enemytype3)
+        local tmp = factory.enemyFactory(200,300,150/enemytype3:getHeight()*enemytype3:getWidth(),150,150/enemytype3:getHeight(), 40, 50, enemytype3)
         table.insert(entity,tmp)
         table.insert(world1,tmp)
         spawnrate = 10
@@ -102,7 +102,7 @@ function love.draw()
     if state == "menu" then
         if splashrate < 0 then
             splashstate = 1- splashstate
-            splashrate = 0.5
+            splashrate = 0.15
         end
         love.graphics.draw(splashes[splashstate+1],0,0,0,1,1,0,0)
         love.graphics.setColor(0,0,0)
