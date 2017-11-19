@@ -14,6 +14,7 @@ function factory.enemyFactory(x,y,w,h,sf,health,dmg, speed, wallhack, img)
     enemy.a = 1250
     enemy.img = img
     enemy.dir = 0
+    enemy.hcolour = 0
     enemy.isChar = true
     enemy.velocity ={0,0}
 
@@ -65,7 +66,7 @@ function factory.enemyFactory(x,y,w,h,sf,health,dmg, speed, wallhack, img)
         else 
             love.graphics.draw(self.img, self.x+window[1], self.y+window[2],0,self.sf,self.sf,0,0)
         end
-        love.graphics.setColor(0,0,0)
+        love.graphics.setColor(self.hcolour,self.hcolour,self.hcolour)
         love.graphics.rectangle("fill", self.x+ window[1],self.y+window[2]-10,self.health,5)
         love.graphics.rectangle("line", self.x+ window[1],self.y+window[2]-10,self.maxhealth,5)
         love.graphics.setColor(255,255,255)
@@ -117,6 +118,7 @@ function factory.playerFactory()
     player.health = 100
     player.maxhealth = 100
     player.dmg = 50
+    player.hcolour = 0
     player.message = "Do you ever think this game will be finished"
     function player:update(dt,world)
         local is_colliding = collidy.collideAll(self, world)
@@ -137,13 +139,14 @@ function factory.playerFactory()
         -- collision detection and response
         if is_colliding then
             self.velocity[2] = 0
+            if love.keyboard.isDown("up") then 
+                self.velocity[2] = -600
+            elseif CheckCollisionHorizontal(self,world) then
+                self.velocity[2] = -600
+            end
             collidy.collideResponseAll(self,world)
         end
 
-        -- player jump
-        if love.keyboard.isDown("up") and is_colliding then
-            self.velocity[2] = -600
-        end
 
         -- player combat
         if self.is_attacking then
@@ -186,15 +189,14 @@ function factory.playerFactory()
         end
 
         -- draw health bar
-        love.graphics.setColor(0,0,0)
+        love.graphics.setColor(self.hcolour,self.hcolour,self.hcolour)
         love.graphics.rectangle("fill", self.x + window[1],self.y-10+window[2],self.health,5)
         love.graphics.rectangle("line", self.x + window[1],self.y-10+window[2],self.maxhealth,5)
         love.graphics.setColor(255,255,255)
 
         -- draw message
-        love.graphics.setColor(0,0,0)
-        love.graphics.print(self.message,50 ,50)
         love.graphics.setColor(255,255,255)
+        love.graphics.print(self.message,50 ,50)
     end
     return player
 end

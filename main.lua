@@ -32,6 +32,7 @@ platforms = {{0, 132,103,800},
 
 function love.load()
     spawnrate = 5
+    cooldown = 0.5
     success = love.window.setMode(1000,800)
     love.graphics.setFont(love.graphics.newFont(30))
     love.graphics.setBackgroundColor(255, 255, 255)
@@ -39,6 +40,7 @@ function love.load()
     splashrate = 0.5
     splashstate = 0
     background = love.graphics.newImage("img/background-normal.png")
+    background2 = love.graphics.newImage("img/background-monster.png")
     player = factory.playerFactory()
     enemytype1 = love.graphics.newImage("img/rabbit-monster.png")
     enemytype2 = love.graphics.newImage("img/lamp-monster.png")
@@ -47,6 +49,7 @@ function love.load()
     window = {0,0}
     entity = {player}
     world1 = {player}
+    thisisbadidea = player
     for i,v in ipairs(platforms) do
         local plat = factory.platformFactory(v[1],v[2],v[3],v[4]);
         table.insert(world1, plat)
@@ -58,12 +61,37 @@ end
 function love.update(dt)
     if state == "menu" then
         splashrate = splashrate - dt
-        if love.keyboard.isDown("s") then
+        if love.keyboard.isDown("space") then
             state = "game"
         end
         return
     end
+    if love.keyboard.isDown("s") then
+        if state == "hide" and cooldown <= 0 then
+            state = "game"
+            love.graphics.setBackgroundColor(255, 255, 255)
+            cooldown = 0.5
+            for i,v in ipairs(entity) do
+                v.hcolour = 0
+            end
+        elseif cooldown <= 0 then
+            state = "hide"
+            love.graphics.setBackgroundColor(0, 0, 0)
+            for i,v in ipairs(entity) do
+                v.hcolour = 255
+            end
+            cooldown = 0.5
+        end
+    end
+    if cooldown >= 0 then cooldown = cooldown - dt end
     spawnrate = spawnrate - dt
+    if state == "hide" then
+        player.health = player.health + dt*5
+        if player.health > player.maxhealth then
+            player.health = player.maxhealth
+        end
+        return
+    end
     if spawnrate < 0 then
         local enemy_type = math.random(1, 3)
         local new_entity
@@ -112,11 +140,15 @@ function love.draw()
         end
         love.graphics.draw(splashes[splashstate+1],0,0,0,1,1,0,0)
         love.graphics.setColor(0,0,0)
-        love.graphics.print("press s to start",300,600)
+        love.graphics.print("press space to start",300,600)
         love.graphics.setColor(255,255,255)
         return
     end
-    love.graphics.draw(background, window[1], window[2],0,1,1,0,0)
+    if state == "hide" then
+        love.graphics.draw(background2, window[1], window[2],0,1,1,0,0)
+    else
+        love.graphics.draw(background, window[1], window[2],0,1,1,0,0)
+    end
     for i,v in ipairs(world1)do
         if v ~= nil and (v.isChar == false or v.health > 0) then 
             v:draw(window)
