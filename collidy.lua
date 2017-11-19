@@ -40,13 +40,18 @@ function collidy.collideAll(a,world)
 end
 
 function collidy.collideResponseAll(a, world, flag)
+    ppp = true
     for i,v in ipairs(world) do
         if v~= a and (v.isChar == false or v.health > 0) and collidy.collide(a,v) then
             if flag and v.isChar then
-                a:combat(v)
+                ppp = false
+                a:combat(v,a.isAttack > 0)
             end
             collidy.collideResponse(a,v)
         end
+    end
+    if flag and ppp then
+        a.message = a.saved
     end
 end
 
