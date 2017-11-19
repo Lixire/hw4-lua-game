@@ -41,6 +41,9 @@ function love.load()
     splashstate = 0
     background = love.graphics.newImage("img/background-normal.png")
     background2 = love.graphics.newImage("img/background-monster.png")
+    sky2 = love.graphics.newImage("img/sky-monster.png")
+    sky = love.graphics.newImage("img/sky-normal.png")
+    gameovers = {love.graphics.newImage("img/game-over1.png"),love.graphics.newImage("img/game-over2.png")}
     player = factory.playerFactory()
     enemytype1 = love.graphics.newImage("img/rabbit-monster.png")
     enemytype2 = love.graphics.newImage("img/lamp-monster.png")
@@ -59,8 +62,10 @@ function love.load()
 end
 
 function love.update(dt)
-    if state == "menu" then
+    if state == "menu" or state == "endgame" then
         splashrate = splashrate - dt
+    end
+    if state == "menu" then
         if love.keyboard.isDown("space") then
             state = "game"
         end
@@ -111,7 +116,7 @@ function love.update(dt)
             startx = v.x
             starty = v.y
             if v.health <= 0 then
-                love.load()
+                state = "endgame"
             end
         end
         if v ~= nil and v.health <= 0 then
@@ -120,7 +125,7 @@ function love.update(dt)
             v:update(dt,world1)
         end
         if v == player then
-            if v.y < 600 and v.y > 500 then
+            if v.y < 600 and v.y > 400 then
                 window[2] = window[2] - (v.y -starty)
             end
             if startx +window[1] > 500 and window[1] > -5700 and v.x> startx then
@@ -140,13 +145,29 @@ function love.draw()
         end
         love.graphics.draw(splashes[splashstate+1],0,0,0,1,1,0,0)
         love.graphics.setColor(0,0,0)
-        love.graphics.print("press space to start",300,600)
+        love.graphics.print("press space to start",350,600)
         love.graphics.setColor(255,255,255)
+        return
+    elseif state == "endgame" then
+        if splashrate < 0 then
+            splashstate = 1- splashstate
+            splashrate = 0.15
+        end
+        love.graphics.draw(gameovers[splashstate+1],190,90,0,0.3,0.3,0,0)
+        love.graphics.setColor(0,0,0)
+        love.graphics.print("You punched: "..tostring(player.score).." enemies, wow!",280,600)
+        love.graphics.print("press space to restart",330,700)
+        love.graphics.setColor(255,255,255)
+        if love.keyboard.isDown("space") then
+            love.load()
+        end
         return
     end
     if state == "hide" then
+        love.graphics.draw(sky2, window[1]*0.6, window[2]*0.6,0,0.8,0.8,0,0)
         love.graphics.draw(background2, window[1], window[2],0,1,1,0,0)
     else
+        love.graphics.draw(sky, window[1]*0.6, window[2]*0.6,0,0.8,0.8,0,0)
         love.graphics.draw(background, window[1], window[2],0,1,1,0,0)
     end
     for i,v in ipairs(world1)do

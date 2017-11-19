@@ -119,6 +119,7 @@ function factory.playerFactory()
     player.maxhealth = 100
     player.dmg = 50
     player.hcolour = 0
+    player.score = 0
     player.message = "Do you ever think this game will be finished"
     function player:update(dt,world)
         local is_colliding = collidy.collideAll(self, world)
@@ -158,7 +159,12 @@ function factory.playerFactory()
             end
             local damaged_entities = collidy.collideResponseAll(weapon_entity,world)
             for _, entity in ipairs(damaged_entities) do
-                if entity.isChar then entity:attacked(self, self.dmg * dt) end
+                if entity.isChar then 
+                    entity:attacked(self, self.dmg * dt) 
+                    if entity.health <= 0 then
+                        self.score = self.score + 1
+                    end
+                end
             end
         end
 
@@ -195,8 +201,9 @@ function factory.playerFactory()
         love.graphics.setColor(255,255,255)
 
         -- draw message
-        love.graphics.setColor(255,255,255)
+        love.graphics.setColor(self.hcolour,self.hcolour,self.hcolour)
         love.graphics.print(self.message,50 ,50)
+        love.graphics.setColor(255,255,255)
     end
     return player
 end
